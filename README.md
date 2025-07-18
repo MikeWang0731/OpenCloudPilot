@@ -1,5 +1,7 @@
 # AIOps OpenCloudPilot
 
+简体中文 | [English](README.en.md)
+
 🤖 基于 Python + FastAPI 的 AIOps 系统后端，专注于 K8s 和 Istio 云原生环境的智能运维。
 
 ✏️ 项目愿景是构建一个开放、开源且免费的AIOps系统，通过整合大型语言模型(LLM)能力，提供革命性的交互体验，让任何人都能轻松、高效地管理云计算资源和微服务架构。
