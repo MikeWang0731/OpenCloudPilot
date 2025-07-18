@@ -1,8 +1,22 @@
+# Kiro IDE files
 .kiro/
+
+# Python cache files
 **/__pycache__/
+
+# IDE files
 **/.idea/
+
+# Git files
 **/.git/
 **/.gitignore
 **/.gitattributes
+
+# macOS files
 **/.DS_Store
+
+# Database files
 cloudpilot.db
+
+# Project planning documents
+project-plan.md
