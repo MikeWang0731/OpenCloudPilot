@@ -1,0 +1,26 @@
+# AIOps CloudPilot 配置文件示例
+
+# 基础配置
+app_name: "AIOps CloudPilot"
+version: "0.1.0"
+debug: false
+log_level: "INFO"
+
+# 数据库配置
+database:
+  url: "sqlite:///./cloudpilot.db"
+  echo: false
+
+# Kubernetes配置
+k8s:
+  in_cluster: true  # 是否在集群内运行
+  kubeconfig_path: null  # kubeconfig文件路径
+  api_server: null  # API Server地址
+  token: null  # 访问令牌
+
+# 大模型配置
+llm:
+  provider: "openai"  # openai, ollama
+  api_key: null  # API密钥
+  base_url: null  # 自定义API地址
+  model: "gpt-3.5-turbo"  # 模型名称
