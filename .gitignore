@@ -1,1 +1,8 @@
-.kiro
+.kiro/
+**/__pycache__/
+**/.idea/
+**/.git/
+**/.gitignore
+**/.gitattributes
+**/.DS_Store
+
