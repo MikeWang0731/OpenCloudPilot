@@ -1,6 +1,14 @@
-# AIOps CloudPilot
+# AIOps OpenCloudPilot
 
-基于 Python + FastAPI 的 AIOps 系统后端，专注于 K8s 和 Istio 云原生环境的智能运维。
+🤖 基于 Python + FastAPI 的 AIOps 系统后端，专注于 K8s 和 Istio 云原生环境的智能运维。
+
+✏️ 项目愿景是构建一个开放、开源且免费的AIOps系统，通过整合大型语言模型(LLM)能力，提供革命性的交互体验，让任何人都能轻松、高效地管理云计算资源和微服务架构。
+
+💻 当前阶段：*后端研发初期*
+
+🏃‍♀️ 下一步计划：当基础功能具备后，发布功能预览图
+
+👏 欢迎大家提出优秀的产品建议与想法！
 
 ## 特性
 
@@ -18,6 +26,7 @@
 - **标准化日志**：使用Python标准日志格式，支持结构化日志记录
 - **统一响应格式**：所有API接口采用一致的JSON响应格式，提供标准化的错误处理
 - **完善测试**：提供完整的测试工具和分类异常处理测试
+- ➡️ **更多功能正在计划**: 自然语言交互能力、智能建议、AgentOps、智能感知、资源预测、故障定位、故障识别与预测等多种基于机器学习与深度学习的能力以及其他 K8s 和 istio 的管理能力。
 
 ## 快速开始
 
@@ -57,237 +66,6 @@ python main.py --mode instant --port 8001
 ```
 
 **注意**: 即时App模式会优先尝试使用集群内配置，如果失败则回退到本地kubeconfig（适合开发环境）。
-
-### API接口
-
-系统采用模块化API设计，将K8s相关功能按模块组织，支持Server模式（多集群管理）和Instant模式（单集群）。
-
-#### Server模式接口
-
-**基础接口**
-- `GET /` - 服务信息
-- `GET /health` - 健康检查
-- `GET /docs` - Swagger UI 文档界面（自定义样式）
-
-**集群管理模块 (`/k8s/cluster`)**
-- `GET /k8s/cluster/list` - 获取集群列表
-- `POST /k8s/cluster/add` - 添加集群配置
-- `POST /k8s/cluster/info` - 获取指定集群信息
-
-**集群概览模块 (`/k8s/overview`)**
-- `POST /k8s/overview/cluster` - 获取指定集群资源概览
-
-**资源管理模块 (`/k8s/resource`)**
-- `POST /k8s/resource/pods` - 获取指定集群Pod列表（支持namespace参数）
-- `POST /k8s/resource/namespaces` - 获取指定集群命名空间详情
-- `POST /k8s/resource/nodes` - 获取指定集群节点详情
-
-**Istio Gateway管理模块 (`/istio/gateway`)**
-- `POST /istio/gateway/list` - 获取指定集群和命名空间的Istio Gateway列表
-
-#### 即时App模式接口
-
-**基础接口**
-- `GET /` - 服务信息
-- `GET /health` - 健康检查
-- `GET /docs` - Swagger UI 文档界面
-
-**集群管理模块 (`/k8s/cluster`)**
-- `GET /k8s/cluster/info` - 获取当前集群信息
-
-**集群概览模块 (`/k8s/overview`)**
-- `POST /k8s/overview/cluster` - 获取当前集群资源概览
-
-**资源管理模块 (`/k8s/resource`)**
-- `POST /k8s/resource/pods` - 获取Pod列表（支持namespace参数）
-- `POST /k8s/resource/namespaces` - 获取命名空间详细信息
-- `POST /k8s/resource/nodes` - 获取节点详细信息
-
-**Istio Gateway管理模块 (`/istio/gateway`)**
-- `POST /istio/gateway/list` - 获取当前集群的Istio Gateway列表
-
-#### 统一响应格式
-
-所有API接口都采用统一的JSON响应格式，确保客户端处理的一致性：
-
-**成功响应**：
-```json
-{
-  "code": 200,
-  "data": { /* 具体数据内容 */ },
-  "message": "操作成功信息（可选）"
-}
-```
-
-**错误响应**：
-```json
-{
-  "code": 500,
-  "message": "具体错误信息"
-}
-```
-
-**Pod列表响应示例**：
-```json
-{
-  "code": 200,
-  "data": {
-    "namespace": "default",
-    "pod_count": 3,
-    "pods": [
-      {
-        "name": "nginx-deployment-abc123",
-        "status": "Running",
-        "ready": 1,
-        "restarts": 0
-      }
-    ]
-  }
-}
-```
-
-**集群概览响应示例**：
-```json
-{
-  "code": 200,
-  "data": {
-    "cluster_name": "my-cluster",
-    "nodes": {
-      "total": 3,
-      "ready": 3,
-      "not_ready": 0
-    },
-    "workloads": {
-      "pods": {
-        "total": 25,
-        "running": 23,
-        "pending": 1,
-        "failed": 1,
-        "succeeded": 0
-      },
-      "deployments": 8
-    },
-    "discovery": {
-      "services": 12
-    },
-    "configs": {
-      "configmaps": 15,
-      "secrets": 10,
-      "namespaces": 5
-    },
-    "resources": {
-      "cpu_requests": 2.5,
-      "memory_requests": 4.2,
-      "cpu_limits": 4.0,
-      "memory_limits": 8.0
-    },
-    "metadata": {
-      "last_updated": "2024-01-15T10:30:00"
-    }
-  }
-}
-```
-
-#### API请求和响应模型
-
-系统使用Pydantic模型确保API请求和响应的类型安全和文档完整性：
-
-**请求模型**
-- **ClusterConfig**: 集群配置模型（用于添加集群）
-  - `name`: 集群名称
-  - `api_server`: K8s API服务器地址
-  - `token`: 访问令牌（可选）
-  - `kubeconfig`: kubeconfig配置（可选）
-  - `description`: 集群描述（可选）
-
-- **ClusterRequest**: 集群操作请求模型
-  - `cluster_name`: 集群名称
-  - `force_refresh`: 是否强制刷新缓存（可选，默认false）
-
-- **PodListRequest**: Pod列表请求模型
-  - `cluster_name`: 集群名称
-  - `namespace`: 命名空间（可选，默认"default"）
-
-- **GatewayRequest**: Istio Gateway请求模型（Server模式）
-  - `cluster_name`: 集群名称
-  - `namespace`: 命名空间（可选，默认"istio-system"）
-
-- **RefreshRequest**: 刷新请求模型（Instant模式）
-  - `force_refresh`: 是否强制刷新缓存（可选，默认false）
-
-**响应模型**
-- **ServiceInfo**: 服务基本信息响应
-- **HealthResponse**: 健康检查响应
-- **ClusterInfo**: 集群信息响应（包含版本、节点数量和节点状态）
-- **PodInfo**: Pod详细信息（名称、状态、就绪状态、重启次数）
-- **PodListResponse**: Pod列表响应（命名空间、Pod数量和Pod列表）
-- **GatewayListResponse**: Istio Gateway列表响应（集群名称、命名空间、Gateway数量和Gateway详情列表）
-- **GatewayInfo**: Gateway详细信息（名称、命名空间、服务器配置、选择器）
-
-### 添加集群配置（Server模式）
-
-```bash
-curl -X POST http://localhost:8000/k8s/cluster/add \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "my-cluster",
-    "api_server": "https://k8s-api.example.com:6443",
-    "token": "your-k8s-token",
-    "description": "生产环境集群"
-  }'
-```
-
-**响应格式**：
-```json
-{
-  "code": 200,
-  "message": "集群 my-cluster 添加成功"
-}
-```
-
-**错误响应**：
-```json
-{
-  "code": 500,
-  "message": "添加集群失败: 具体错误信息"
-}
-```
-
-### 获取集群信息
-
-```bash
-# Server模式 - 获取集群列表
-curl http://localhost:8000/k8s/cluster/list
-
-# Server模式 - 获取指定集群信息
-curl -X POST http://localhost:8000/k8s/cluster/info \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_name": "my-cluster"
-  }'
-
-# 即时App模式
-curl http://localhost:8001/k8s/cluster/info
-```
-
-### 获取Istio Gateway信息
-
-```bash
-# Server模式 - 获取指定集群的Gateway列表
-curl -X POST http://localhost:8000/istio/gateway/list \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cluster_name": "my-cluster",
-    "namespace": "istio-system"
-  }'
-
-# 即时App模式 - 获取当前集群的Gateway列表
-curl -X POST http://localhost:8001/istio/gateway/list \
-  -H "Content-Type: application/json" \
-  -d '{
-    "force_refresh": false
-  }'
-```
 
 ## 配置说明
 
@@ -394,36 +172,6 @@ spec:
 - **容错处理**：单个资源获取失败不影响整体监控功能
 - **资源解析**：智能解析K8s资源单位（m、Ki、Mi、Gi等）
 
-#### 使用示例
-
-```python
-from src.core.cluster_monitor import ClusterMonitor
-from kubernetes.dynamic import DynamicClient
-
-# 创建监控器
-monitor = ClusterMonitor(
-    dynamic_client=dynamic_client,
-    cache_ttl=30  # 缓存30秒
-)
-
-# 获取资源概览
-overview = await monitor.get_resource_overview()
-print(f"节点总数: {overview.nodes['total']}")
-print(f"就绪节点: {overview.nodes['ready']}")
-print(f"运行中Pod: {overview.workloads['pods']['running']}")
-print(f"CPU请求总量: {overview.resources['cpu_requests']}核")
-print(f"内存请求总量: {overview.resources['memory_requests']}GB")
-
-# 获取命名空间详情
-namespaces = await monitor.get_namespaces_detail()
-for ns in namespaces:
-    print(f"命名空间 {ns.name}: {ns.pods} pods, {ns.deployments} deployments")
-
-# 获取节点详情
-nodes = await monitor.get_nodes_detail()
-for node in nodes:
-    print(f"节点 {node.name}: {node.status} ({', '.join(node.roles)})")
-```
 
 ## 项目结构
 
@@ -451,7 +199,7 @@ for node in nodes:
 │           └── gateway_api.py    # Istio Gateway管理API
 └── unit_test/             # 测试模块
     ├── test_modes.py      # 基础模式测试
-    └── test_cluster_monitor.py # 集群监控功能测试（已优化代码质量）
+    └── test_cluster_monitor.py # 集群监控功能测试
 ```
 
 ## 开发计划
@@ -471,7 +219,6 @@ for node in nodes:
 ### 第三阶段（进行中）
 - [x] 统一API响应格式
 - [x] 改进错误处理机制
-- [x] Istio Gateway管理API
 - [x] 完善的API文档和示例
 - [ ] AI Dashboard 后端
 - [ ] 日志和事件收集
@@ -497,59 +244,3 @@ for node in nodes:
 - **性能优化**：代码复杂度控制在合理范围内，避免过长函数和过多分支
 - **统一响应**：所有API接口采用统一的JSON响应格式，避免使用HTTPException抛出异常，确保客户端处理的一致性
 - **异步优化**：充分利用异步编程和并发处理，提升系统性能
-
-### 测试
-
-项目提供了完整的测试工具来验证集群监控功能：
-
-#### 集群监控测试
-
-使用专门的测试脚本验证集群监控API：
-
-```bash
-# 测试即时模式
-python unit_test/test_cluster_monitor.py instant
-
-# 测试服务器模式
-python unit_test/test_cluster_monitor.py server
-
-# 测试两种模式
-python unit_test/test_cluster_monitor.py both
-
-# 指定服务地址
-python unit_test/test_cluster_monitor.py instant http://localhost:8001
-```
-
-测试功能包括：
-- 健康检查验证
-- 集群概览数据获取
-- 命名空间详情查询
-- 节点状态检查
-- 缓存性能测试
-- 多集群管理测试（Server模式）
-- 分类异常处理测试（网络异常、数据格式异常、未知异常）
-- 完整的错误信息展示和调试支持
-
-#### 模式测试
-
-```bash
-# 运行基础模式测试
-python unit_test/test_modes.py
-```
-
-#### 测试特性
-
-测试工具具备以下特性：
-- **智能异常处理**：区分网络异常、数据格式异常和未知异常
-- **详细错误报告**：提供具体的错误信息和状态码
-- **性能测试**：包含缓存功能的性能对比测试
-- **灵活配置**：支持自定义服务地址和测试模式
-- **代码质量**：遵循Python最佳实践，包括行长度限制和异常处理规范
-
-## 贡献
-
-欢迎提交Issue和Pull Request！请确保代码符合项目的质量标准。
-
-## 许可证
-
-MIT License
