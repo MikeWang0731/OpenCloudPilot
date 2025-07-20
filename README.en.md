@@ -1,12 +1,14 @@
-# AIOps OpenCloudPilot
+# AIOps CloudPilot
+
+[简体中文](README.md) | English
 
 🤖 AIOps system backend based on Python + FastAPI, focusing on intelligent operations for K8s and Istio cloud-native environments.
 
 ✏️ The project vision is to build an open, open-source, and free AIOps system that provides a revolutionary interactive experience by integrating Large Language Model (LLM) capabilities, making it easy and efficient for anyone to manage cloud computing resources and microservice architectures.
 
-💻 Current stage: *Early backend development*
+💻 Current stage: *Early-stage backend development*
 
-🏃‍♀️ Next steps: Release feature preview when basic functionality is ready
+🏃‍♀️ Next steps: Complete AI Dashboard backend and log event collection features
 
 👏 Welcome to share excellent product suggestions and ideas!
 
@@ -16,6 +18,7 @@
 - **Multi-cluster Management**: Server mode supports managing multiple K8s clusters
 - **Intelligent Monitoring**: Efficient cluster monitoring system with caching and background tasks
 - **Resource Analysis**: Detailed cluster resource usage statistics and analysis
+- **Resource Parsing**: Intelligent parsing of K8s resource units (m, Ki, Mi, Gi, etc.)
 - **Istio Support**: Complete Istio Gateway management functionality
 - **Pluggable Architecture**: Easy to extend features and reuse modules
 - **Modular API Design**: K8s and Istio related APIs organized by functional modules, supporting code reuse and maintenance
@@ -92,7 +95,7 @@ LLM_MODEL=gpt-3.5-turbo
 
 ### Configuration File
 
-Copy `config.example.yaml` to `config.yaml` and modify the corresponding configurations.
+Copy `config.example.yaml` to `config.yaml` and modify the corresponding configurations. The configuration file uses YAML format and is loaded and parsed by the `Settings` class.
 
 ## Deployment Methods
 
@@ -138,9 +141,20 @@ spec:
           value: "true"
 ```
 
-## Cluster Monitoring Features
+## Core Features
 
-### Core Monitoring Components
+### Resource Parser (ResourceParser)
+
+The system provides powerful resource parsing capabilities through the `ResourceParser` class:
+
+- **Resource Unit Conversion**: Intelligent parsing of CPU (m, u, n) and memory (Ki, Mi, Gi, Ti, Pi) units
+- **Resource Usage Calculation**: Calculate resource usage percentages, supporting conversion between different units
+- **LLM-Friendly Formatting**: Format resource data into LLM-friendly structures for AI analysis
+- **Error Indicator Extraction**: Automatically extract error indicators from resource data
+- **Resource Relationship Analysis**: Analyze owner and related relationships between resources
+- **Resource Limit Validation**: Validate the reasonableness of resource requests and limits
+
+### Cluster Monitoring Features
 
 The system provides powerful cluster monitoring capabilities through the `ClusterMonitor` class for efficient cluster state monitoring:
 
@@ -153,16 +167,18 @@ The system provides powerful cluster monitoring capabilities through the `Cluste
 - CPU/memory request and limit statistics
 - Last update time
 
-**Namespace Details (NamespaceDetail)**
-- Namespace name and status
-- Pod, Deployment, Service counts in each namespace
-- Creation time information
-
 **Node Details (NodeDetail)**
 - Node name, status, and role
-- Kubernetes version, operating system information
-- CPU/memory capacity and allocatable resources
-- Container runtime information
+- Resource capacity and allocatable resources
+- Resource usage and health score
+- Node conditions and system information
+- Error indicators and taint information
+
+**Pod Details (PodDetail)**
+- Pod name, status, and namespace
+- Container information and health status
+- Resource usage and configuration
+- Pod conditions and event information
 
 #### Monitoring Features
 
@@ -171,6 +187,16 @@ The system provides powerful cluster monitoring capabilities through the `Cluste
 - **Background Monitoring**: Supports starting background monitoring tasks to periodically update cluster status
 - **Fault Tolerance**: Single resource retrieval failure does not affect overall monitoring functionality
 - **Resource Parsing**: Intelligently parses K8s resource units (m, Ki, Mi, Gi, etc.)
+
+### API Design
+
+The system adopts a modular API design, mainly including:
+
+- **Node API**: Node management API, supporting retrieval of node lists, details, and capacity information
+- **Pod API**: Pod management API, supporting retrieval of Pod lists and details
+- **Other Resource APIs**: Supporting management of Deployment, Service, and other resources
+
+All APIs adopt a unified response format, including status code, message, and data parts, ensuring client handling consistency.
 
 ## Project Structure
 
@@ -181,24 +207,36 @@ The system provides powerful cluster monitoring capabilities through the `Cluste
 ├── cloudpilot.db          # SQLite database file
 ├── src/
 │   ├── core/              # Core modules
+│   │   ├── __init__.py    # Package initialization
+│   │   ├── async_utils.py # Async utilities
+│   │   ├── cache_utils.py # Cache utilities
 │   │   ├── config.py      # Configuration management
+│   │   ├── error_handler.py # Error handling
+│   │   ├── k8s_utils.py   # K8s utilities
 │   │   ├── logger.py      # Log configuration
-│   │   └── cluster_monitor.py  # Cluster monitoring core
+│   │   ├── pagination.py  # Pagination utilities
+│   │   ├── resource_cache.py # Resource cache
+│   │   ├── resource_parser.py # Resource parsing
+│   │   └── cluster_monitor.py # Cluster monitoring core
 │   └── modes/             # Launch modes
+│       ├── __init__.py    # Package initialization
 │       ├── base_mode.py   # Base mode class
 │       ├── instant_app.py # Instant App mode
 │       ├── server_mode.py # Server mode
 │       ├── k8s/           # K8s related API modules
 │       │   ├── __init__.py
-│       │   ├── cluster_management_api.py  # Cluster management API
-│       │   ├── cluster_overview_api.py    # Cluster overview API
-│       │   └── resource_api.py            # Resource management API
+│       │   ├── node_api.py # Node API
+│       │   ├── pod_api.py  # Pod API
+│       │   └── ...         # Other resource APIs
 │       └── istio/         # Istio related API modules
 │           ├── __init__.py
-│           └── gateway_api.py    # Istio Gateway management API
+│           └── gateway_api.py # Istio Gateway management API
 └── unit_test/             # Test modules
-    ├── test_modes.py      # Base mode tests
-    └── test_cluster_monitor.py # Cluster monitoring feature tests
+    ├── test_async_performance.py # Async performance tests
+    ├── test_cluster_monitor.py   # Cluster monitoring tests
+    ├── test_error_handling.py    # Error handling tests
+    ├── test_pagination.py        # Pagination feature tests
+    └── ...                       # Other tests
 ```
 
 ## Development Plan
@@ -220,7 +258,7 @@ The system provides powerful cluster monitoring capabilities through the `Cluste
 - [x] Improved error handling mechanism
 - [x] Complete API documentation and examples
 - [ ] AI Dashboard backend
-- [ ] Log and event collection
+- [x] Log and event collection
 - [ ] AI Chat backend integration
 
 ### Phase 4 (Planned)
@@ -243,5 +281,3 @@ The project follows Python best practices:
 - **Performance Optimization**: Code complexity controlled within a reasonable range, avoiding overly long functions and too many branches
 - **Unified Response**: All API interfaces adopt a unified JSON response format, avoiding throwing exceptions with HTTPException, ensuring client handling consistency
 - **Asynchronous Optimization**: Fully utilizes asynchronous programming and concurrent processing to improve system performance
-
-[简体中文](README.md) | English

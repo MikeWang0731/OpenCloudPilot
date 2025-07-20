@@ -1,4 +1,4 @@
-# AIOps OpenCloudPilot
+# AIOps CloudPilot
 
 简体中文 | [English](README.en.md)
 
@@ -6,9 +6,9 @@
 
 ✏️ 项目愿景是构建一个开放、开源且免费的AIOps系统，通过整合大型语言模型(LLM)能力，提供革命性的交互体验，让任何人都能轻松、高效地管理云计算资源和微服务架构。
 
-💻 当前阶段：*后端研发初期*
+💻 当前阶段：*后端研发前期*
 
-🏃‍♀️ 下一步计划：当基础功能具备后，发布功能预览图
+🏃‍♀️ 下一步计划：完善AI Dashboard 后端和日志事件收集功能
 
 👏 欢迎大家提出优秀的产品建议与想法！
 
@@ -18,6 +18,7 @@
 - **多集群管理**：Server模式支持管理多个K8s集群
 - **智能监控**：高效的集群监控系统，支持缓存和后台任务
 - **资源分析**：详细的集群资源使用情况统计和分析
+- **资源解析**：智能解析K8s资源单位（m、Ki、Mi、Gi等）
 - **Istio支持**：完整的Istio Gateway管理功能
 - **插拔式架构**：便于功能扩展和模块复用
 - **模块化API设计**：K8s和Istio相关API按功能模块化组织，支持代码复用和维护
@@ -94,7 +95,7 @@ LLM_MODEL=gpt-3.5-turbo
 
 ### 配置文件
 
-复制 `config.example.yaml` 为 `config.yaml` 并修改相应配置。
+复制 `config.example.yaml` 为 `config.yaml` 并修改相应配置。配置文件使用YAML格式，通过 `Settings` 类进行加载和解析。
 
 ## 部署方式
 
@@ -140,9 +141,20 @@ spec:
           value: "true"
 ```
 
-## 集群监控功能
+## 核心功能
 
-### 核心监控组件
+### 资源解析器 (ResourceParser)
+
+系统提供了强大的资源解析功能，通过 `ResourceParser` 类实现对K8s资源的智能解析：
+
+- **资源单位转换**：支持CPU (m, u, n) 和内存 (Ki, Mi, Gi, Ti, Pi) 单位的智能解析
+- **资源使用率计算**：计算资源使用百分比，支持不同单位间的转换
+- **LLM友好格式化**：将资源数据格式化为LLM友好的结构，便于AI分析
+- **错误指标提取**：自动提取资源数据中的错误指标
+- **资源关系分析**：分析资源间的所有者和关联关系
+- **资源限制验证**：验证资源请求和限制的合理性
+
+### 集群监控功能
 
 系统提供了强大的集群监控功能，通过 `ClusterMonitor` 类实现高效的集群状态监控：
 
@@ -155,16 +167,18 @@ spec:
 - CPU/内存请求量和限制量统计
 - 最后更新时间
 
-**命名空间详情 (NamespaceDetail)**
-- 命名空间名称和状态
-- 各命名空间内的Pod、Deployment、Service数量
-- 创建时间信息
-
 **节点详情 (NodeDetail)**
 - 节点名称、状态和角色
-- Kubernetes版本、操作系统信息
-- CPU/内存容量和可分配资源
-- 容器运行时信息
+- 资源容量和可分配资源
+- 资源使用情况和健康分数
+- 节点条件和系统信息
+- 错误指标和污点信息
+
+**Pod详情 (PodDetail)**
+- Pod名称、状态和命名空间
+- 容器信息和健康状态
+- 资源使用情况和配置
+- Pod条件和事件信息
 
 #### 监控特性
 
@@ -174,6 +188,15 @@ spec:
 - **容错处理**：单个资源获取失败不影响整体监控功能
 - **资源解析**：智能解析K8s资源单位（m、Ki、Mi、Gi等）
 
+### API设计
+
+系统采用模块化API设计，主要包括：
+
+- **Node API**：节点管理API，支持获取节点列表、详情和容量信息
+- **Pod API**：Pod管理API，支持获取Pod列表和详情信息
+- **其他资源API**：支持Deployment、Service等资源的管理
+
+所有API均采用统一的响应格式，包含状态码、消息和数据三部分，确保客户端处理的一致性。
 
 ## 项目结构
 
@@ -184,24 +207,36 @@ spec:
 ├── cloudpilot.db          # SQLite数据库文件
 ├── src/
 │   ├── core/              # 核心模块
+│   │   ├── __init__.py    # 包初始化
+│   │   ├── async_utils.py # 异步工具
+│   │   ├── cache_utils.py # 缓存工具
 │   │   ├── config.py      # 配置管理
+│   │   ├── error_handler.py # 错误处理
+│   │   ├── k8s_utils.py   # K8s工具
 │   │   ├── logger.py      # 日志配置
-│   │   └── cluster_monitor.py  # 集群监控核心
+│   │   ├── pagination.py  # 分页工具
+│   │   ├── resource_cache.py # 资源缓存
+│   │   ├── resource_parser.py # 资源解析
+│   │   └── cluster_monitor.py # 集群监控核心
 │   └── modes/             # 启动模式
+│       ├── __init__.py    # 包初始化
 │       ├── base_mode.py   # 基础模式类
 │       ├── instant_app.py # 即时App模式
 │       ├── server_mode.py # Server模式
 │       ├── k8s/           # K8s相关API模块
 │       │   ├── __init__.py
-│       │   ├── cluster_management_api.py  # 集群管理API
-│       │   ├── cluster_overview_api.py    # 集群概览API
-│       │   └── resource_api.py            # 资源管理API
+│       │   ├── node_api.py # 节点API
+│       │   ├── pod_api.py  # Pod API
+│       │   └── ...         # 其他资源API
 │       └── istio/         # Istio相关API模块
 │           ├── __init__.py
-│           └── gateway_api.py    # Istio Gateway管理API
+│           └── gateway_api.py # Istio Gateway管理API
 └── unit_test/             # 测试模块
-    ├── test_modes.py      # 基础模式测试
-    └── test_cluster_monitor.py # 集群监控功能测试
+    ├── test_async_performance.py # 异步性能测试
+    ├── test_cluster_monitor.py   # 集群监控测试
+    ├── test_error_handling.py    # 错误处理测试
+    ├── test_pagination.py        # 分页功能测试
+    └── ...                       # 其他测试
 ```
 
 ## 开发计划
@@ -223,7 +258,7 @@ spec:
 - [x] 改进错误处理机制
 - [x] 完善的API文档和示例
 - [ ] AI Dashboard 后端
-- [ ] 日志和事件收集
+- [x] 日志和事件收集
 - [ ] AI Chat 后端集成
 
 ### 第四阶段（计划中）
