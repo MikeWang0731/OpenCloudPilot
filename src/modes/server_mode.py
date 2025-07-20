@@ -21,7 +21,12 @@ from src.core.cluster_monitor import ClusterMonitor
 from .base_mode import BaseMode
 from .k8s.cluster_management_api import create_server_cluster_router
 from .k8s.cluster_overview_api import create_server_overview_router
-from .k8s.resource_api import create_server_resource_router
+from .k8s.resources.pod_api import create_server_pod_router
+from .k8s.resources.deployment_api import create_server_deployment_router
+from .k8s.resources.service_api import create_server_service_router
+from .k8s.resources.node_api import create_server_node_router
+from .k8s.resources.logs_api import create_server_logs_router
+from .k8s.resources.events_api import create_server_events_router
 from .istio.gateway_api import create_server_gateway_router
 
 
@@ -231,10 +236,17 @@ class ServerMode(BaseMode):
             """健康检查"""
             return {"code": 200, "data": {"status": "healthy", "mode": "server"}}
 
-        # 注册K8s相关路由
+        # 注册K8s集群管理、资源概览相关路由
         app.include_router(create_server_cluster_router(self))
         app.include_router(create_server_overview_router(self))
-        app.include_router(create_server_resource_router(self))
+
+        # 注册K8s资源管理路由
+        app.include_router(create_server_pod_router(self))
+        app.include_router(create_server_deployment_router(self))
+        app.include_router(create_server_service_router(self))
+        app.include_router(create_server_node_router(self))
+        app.include_router(create_server_logs_router(self))
+        app.include_router(create_server_events_router(self))
 
         # 注册Istio相关路由
         app.include_router(create_server_gateway_router(self))

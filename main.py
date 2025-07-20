@@ -10,6 +10,7 @@ AIOps CloudPilot 主启动文件
 import argparse
 import asyncio
 import sys
+import urllib3
 
 from src.core.config import Settings
 from src.core.logger import setup_logger
@@ -57,4 +58,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    urllib3.disable_warnings()
     asyncio.run(main())

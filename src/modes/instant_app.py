@@ -17,7 +17,12 @@ from src.core.cluster_monitor import ClusterMonitor
 from .base_mode import BaseMode
 from .k8s.cluster_management_api import create_instant_cluster_router
 from .k8s.cluster_overview_api import create_instant_overview_router
-from .k8s.resource_api import create_instant_resource_router
+from .k8s.resources.pod_api import create_instant_pod_router
+from .k8s.resources.deployment_api import create_instant_deployment_router
+from .k8s.resources.service_api import create_instant_service_router
+from .k8s.resources.node_api import create_instant_node_router
+from .k8s.resources.logs_api import create_instant_logs_router
+from .k8s.resources.events_api import create_instant_events_router
 from .istio.gateway_api import create_instant_gateway_router
 
 
@@ -96,7 +101,14 @@ class InstantAppMode(BaseMode):
         # 注册K8s相关路由
         app.include_router(create_instant_cluster_router(self))
         app.include_router(create_instant_overview_router(self))
-        app.include_router(create_instant_resource_router(self))
+
+        # 注册K8s资源管理路由
+        app.include_router(create_instant_pod_router(self))
+        app.include_router(create_instant_deployment_router(self))
+        app.include_router(create_instant_service_router(self))
+        app.include_router(create_instant_node_router(self))
+        app.include_router(create_instant_logs_router(self))
+        app.include_router(create_instant_events_router(self))
 
         # 注册Istio相关路由
         app.include_router(create_instant_gateway_router(self))

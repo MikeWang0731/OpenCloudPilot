@@ -141,7 +141,7 @@ class ClusterMonitor:
         return datetime.now() - cache_time < timedelta(seconds=self.cache_ttl)
 
     async def get_resource_overview(
-        self, force_refresh: bool = False
+        self, cluster_name: str, force_refresh: bool = False
     ) -> ResourceOverview:
         """
         获取集群资源概览
@@ -157,10 +157,14 @@ class ClusterMonitor:
             and self._is_cache_valid(self._overview_cache_time)
             and self._overview_cache
         ):
-            self.logger.debug("使用缓存的资源概览数据")
+            self.logger.debug(
+                "[获取集群资源概览][{%s}]使用缓存的资源概览数据", cluster_name
+            )
             return self._overview_cache
 
-        self.logger.info("开始收集集群资源概览数据...")
+        self.logger.info(
+            "[获取集群资源概览][{%s}]开始收集集群资源概览数据...", cluster_name
+        )
         start_time = time.time()
 
         try:
@@ -231,15 +235,23 @@ class ClusterMonitor:
             self._overview_cache_time = datetime.now()
 
             elapsed_time = time.time() - start_time
-            self.logger.info("资源概览数据收集完成，耗时: %.2f秒", elapsed_time)
+            self.logger.info(
+                "[获取集群资源概览][{%s}]资源概览数据收集完成，耗时: %.2f秒",
+                cluster_name,
+                elapsed_time,
+            )
 
             return overview
 
         except Exception as e:
-            self.logger.error("获取资源概览失败: %s", e)
+            self.logger.error(
+                "[获取集群资源概览][{%s}]获取资源概览失败: %s", cluster_name, e
+            )
             # 如果有缓存数据，返回缓存
             if self._overview_cache:
-                self.logger.warning("使用过期的缓存数据")
+                self.logger.warning(
+                    "[获取集群资源概览][{%s}]使用过期的缓存数据", cluster_name
+                )
                 return self._overview_cache
             raise
 

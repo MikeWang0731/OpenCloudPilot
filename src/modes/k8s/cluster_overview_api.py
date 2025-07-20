@@ -35,7 +35,9 @@ def create_server_overview_router(server_mode_instance) -> APIRouter:
             if not monitor:
                 return {"code": 404, "message": "集群不存在或连接失败"}
 
-            overview = await monitor.get_resource_overview(force_refresh=force_refresh)
+            overview = await monitor.get_resource_overview(
+                cluster_name, force_refresh=force_refresh
+            )
             result = monitor.to_dict(overview)
             result["cluster_name"] = cluster_name
             return {"code": 200, "data": result}
