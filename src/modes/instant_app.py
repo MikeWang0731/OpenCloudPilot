@@ -111,7 +111,7 @@ class InstantAppMode(BaseMode):
         app.include_router(create_instant_events_router(self))
 
         # 注册Istio相关路由
-        app.include_router(create_instant_gateway_router(self))
+
 
         return app
 

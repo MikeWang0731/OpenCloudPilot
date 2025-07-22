@@ -249,7 +249,7 @@ class ServerMode(BaseMode):
         app.include_router(create_server_events_router(self))
 
         # 注册Istio相关路由
-        app.include_router(create_server_gateway_router(self))
+        
 
         return app
 
