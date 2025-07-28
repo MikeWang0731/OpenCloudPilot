@@ -23,7 +23,6 @@ from .k8s.resources.service_api import create_instant_service_router
 from .k8s.resources.node_api import create_instant_node_router
 from .k8s.resources.logs_api import create_instant_logs_router
 from .k8s.resources.events_api import create_instant_events_router
-from .istio.gateway_api import create_instant_gateway_router
 
 
 # 模型类已移至各自的API文件中
@@ -111,7 +110,9 @@ class InstantAppMode(BaseMode):
         app.include_router(create_instant_events_router(self))
 
         # 注册Istio相关路由
+        from .istio.router import create_instant_istio_router
 
+        app.include_router(create_instant_istio_router(self))
 
         return app
 

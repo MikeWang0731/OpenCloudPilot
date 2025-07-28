@@ -30,6 +30,18 @@ class CacheConfig:
     logs_ttl: int = 30
     events_ttl: int = 60
 
+    # Istio资源类型的TTL配置（秒）
+    istiod_detail_ttl: int = 90
+    gateway_workload_detail_ttl: int = 90
+    gateway_list_ttl: int = 60
+    gateway_detail_ttl: int = 90
+    virtualservice_list_ttl: int = 60
+    virtualservice_detail_ttl: int = 90
+    destinationrule_list_ttl: int = 60
+    destinationrule_detail_ttl: int = 90
+    istio_logs_ttl: int = 30
+    istio_events_ttl: int = 60
+
     # 缓存大小限制
     max_cache_entries: int = 1000
 
@@ -122,6 +134,17 @@ class ResourceCache:
             ("node", "detail"): self.config.node_detail_ttl,
             ("logs", "retrieve"): self.config.logs_ttl,
             ("events", "retrieve"): self.config.events_ttl,
+            # Istio资源类型TTL映射
+            ("istiod", "detail"): self.config.istiod_detail_ttl,
+            ("gateway_workload", "detail"): self.config.gateway_workload_detail_ttl,
+            ("gateway", "list"): self.config.gateway_list_ttl,
+            ("gateway", "detail"): self.config.gateway_detail_ttl,
+            ("virtualservice", "list"): self.config.virtualservice_list_ttl,
+            ("virtualservice", "detail"): self.config.virtualservice_detail_ttl,
+            ("destinationrule", "list"): self.config.destinationrule_list_ttl,
+            ("destinationrule", "detail"): self.config.destinationrule_detail_ttl,
+            ("istio_logs", "retrieve"): self.config.istio_logs_ttl,
+            ("istio_events", "retrieve"): self.config.istio_events_ttl,
         }
 
         return ttl_map.get((resource_type, operation), 60)  # 默认60秒
@@ -362,6 +385,17 @@ class ResourceCache:
                     "node_detail": self.config.node_detail_ttl,
                     "logs": self.config.logs_ttl,
                     "events": self.config.events_ttl,
+                    # Istio资源TTL配置
+                    "istiod_detail": self.config.istiod_detail_ttl,
+                    "gateway_workload_detail": self.config.gateway_workload_detail_ttl,
+                    "gateway_list": self.config.gateway_list_ttl,
+                    "gateway_detail": self.config.gateway_detail_ttl,
+                    "virtualservice_list": self.config.virtualservice_list_ttl,
+                    "virtualservice_detail": self.config.virtualservice_detail_ttl,
+                    "destinationrule_list": self.config.destinationrule_list_ttl,
+                    "destinationrule_detail": self.config.destinationrule_detail_ttl,
+                    "istio_logs": self.config.istio_logs_ttl,
+                    "istio_events": self.config.istio_events_ttl,
                 },
             },
         }

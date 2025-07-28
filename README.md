@@ -19,7 +19,7 @@
 - **智能监控**：高效的集群监控系统，支持缓存和后台任务
 - **资源分析**：详细的集群资源使用情况统计和分析
 - **资源解析**：智能解析K8s资源单位（m、Ki、Mi、Gi等）
-- **Istio支持**：完整的Istio Gateway管理功能
+- **Istio支持**：完整的Istio服务网格管理功能，包括工作负载监控和流量管理
 - **插拔式架构**：便于功能扩展和模块复用
 - **模块化API设计**：K8s和Istio相关API按功能模块化组织，支持代码复用和维护
 - **异步高性能**：基于FastAPI和异步编程，支持并发数据获取
@@ -188,13 +188,66 @@ spec:
 - **容错处理**：单个资源获取失败不影响整体监控功能
 - **资源解析**：智能解析K8s资源单位（m、Ki、Mi、Gi等）
 
+### Istio服务网格管理
+
+系统提供了完整的Istio服务网格管理功能，通过统一的API接口支持Istio工作负载监控和流量管理：
+
+#### Istio工作负载管理
+
+**Istiod工作负载监控**
+- Istiod部署状态和健康指标监控
+- 容器资源使用情况和配置分析
+- Istiod日志查询和事件追踪
+- 健康评分和错误指标检测
+
+**Istio Gateway工作负载监控**
+- istio-ingressgateway部署监控
+- Gateway Pod状态和流量指标
+- Gateway工作负载日志和事件查询
+- 网关健康状态评估
+
+#### Istio流量管理组件
+
+**Gateway配置管理**
+- Gateway资源配置查询和分析
+- 服务器配置、选择器和TLS设置验证
+- Gateway配置健康检查和问题诊断
+- 配置变更历史和影响分析
+
+**VirtualService路由管理**
+- VirtualService路由规则配置查询
+- HTTP/TCP/TLS路由规则分析
+- 路由匹配条件和目标配置验证
+- 路由健康状态和配置问题检测
+
+**DestinationRule流量策略**
+- DestinationRule流量策略配置管理
+- 负载均衡、连接池和熔断器配置
+- 子集定义和流量分发策略
+- 流量策略健康评估和优化建议
+
+#### Istio健康分析
+
+- **智能健康评分**：基于Istio特定指标的健康评分算法
+- **配置验证**：自动检测常见的Istio配置问题
+- **性能优化建议**：基于资源使用情况提供优化建议
+- **故障诊断**：提供详细的错误指标和故障排查信息
+
 ### API设计
 
 系统采用模块化API设计，主要包括：
 
+#### K8s资源管理API
 - **Node API**：节点管理API，支持获取节点列表、详情和容量信息
 - **Pod API**：Pod管理API，支持获取Pod列表和详情信息
-- **其他资源API**：支持Deployment、Service等资源的管理
+- **Deployment API**：部署管理API，支持部署状态监控和扩缩容操作
+- **Service API**：服务管理API，支持服务发现和端点管理
+- **其他资源API**：支持ConfigMap、Secret等资源的管理
+
+#### Istio服务网格API
+- **Istio工作负载API**：Istiod和Gateway工作负载监控
+- **Istio组件API**：Gateway、VirtualService、DestinationRule管理
+- **Istio健康API**：服务网格健康状态和性能分析
 
 所有API均采用统一的响应格式，包含状态码、消息和数据三部分，确保客户端处理的一致性。
 
@@ -230,13 +283,20 @@ spec:
 │       │   └── ...         # 其他资源API
 │       └── istio/         # Istio相关API模块
 │           ├── __init__.py
-│           └── gateway_api.py # Istio Gateway管理API
+│           ├── router.py      # Istio统一路由注册
+│           ├── workloads/     # Istio工作负载管理
+│           │   ├── istiod_api.py # Istiod工作负载API
+│           │   └── gateway_workload_api.py # Gateway工作负载API
+│           ├── components/    # Istio组件管理
+│           │   ├── gateway_api.py # Gateway配置API
+│           │   ├── virtualservice_api.py # VirtualService API
+│           │   └── destinationrule_api.py # DestinationRule API
+│           ├── utils/         # Istio工具模块
+│           │   ├── istio_parser.py # Istio资源解析
+│           │   ├── health_analyzer.py # 健康分析
+│           │   └── cache_manager.py # 缓存管理
+│           └── health_summary_api.py # 健康摘要API
 └── unit_test/             # 测试模块
-    ├── test_async_performance.py # 异步性能测试
-    ├── test_cluster_monitor.py   # 集群监控测试
-    ├── test_error_handling.py    # 错误处理测试
-    ├── test_pagination.py        # 分页功能测试
-    └── ...                       # 其他测试
 ```
 
 ## 开发计划
@@ -253,15 +313,17 @@ spec:
 - [x] 缓存机制和性能优化
 - [x] 完整的测试工具
 
-### 第三阶段（进行中）
+### 第三阶段 ✅
 - [x] 统一API响应格式
 - [x] 改进错误处理机制
 - [x] 完善的API文档和示例
-- [ ] AI Dashboard 后端
+- [x] Istio服务网格完整支持
 - [x] 日志和事件收集
-- [ ] AI Chat 后端集成
+- [x] 系统集成测试和文档
 
 ### 第四阶段（计划中）
+- [ ] AI Dashboard 后端
+- [ ] AI Chat 后端集成
 - [ ] K8s Fast Dashboard
 - [ ] Istio Fast Dashboard
 - [ ] LLM智能分析

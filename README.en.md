@@ -19,7 +19,7 @@
 - **Intelligent Monitoring**: Efficient cluster monitoring system with caching and background tasks
 - **Resource Analysis**: Detailed cluster resource usage statistics and analysis
 - **Resource Parsing**: Intelligent parsing of K8s resource units (m, Ki, Mi, Gi, etc.)
-- **Istio Support**: Complete Istio Gateway management functionality
+- **Istio Support**: Complete Istio service mesh management functionality, including workload monitoring and traffic management
 - **Pluggable Architecture**: Easy to extend features and reuse modules
 - **Modular API Design**: K8s and Istio related APIs organized by functional modules, supporting code reuse and maintenance
 - **Asynchronous High Performance**: Based on FastAPI and asynchronous programming, supporting concurrent data retrieval
@@ -154,6 +154,51 @@ The system provides powerful resource parsing capabilities through the `Resource
 - **Resource Relationship Analysis**: Analyze owner and related relationships between resources
 - **Resource Limit Validation**: Validate the reasonableness of resource requests and limits
 
+### Istio Service Mesh Management
+
+The system provides complete Istio service mesh management functionality through unified API interfaces supporting Istio workload monitoring and traffic management:
+
+#### Istio Workload Management
+
+**Istiod Workload Monitoring**
+- Istiod deployment status and health metrics monitoring
+- Container resource usage and configuration analysis
+- Istiod log queries and event tracking
+- Health scoring and error indicator detection
+
+**Istio Gateway Workload Monitoring**
+- istio-ingressgateway deployment monitoring
+- Gateway Pod status and traffic metrics
+- Gateway workload logs and event queries
+- Gateway health status assessment
+
+#### Istio Traffic Management Components
+
+**Gateway Configuration Management**
+- Gateway resource configuration queries and analysis
+- Server configuration, selector, and TLS settings validation
+- Gateway configuration health checks and issue diagnosis
+- Configuration change history and impact analysis
+
+**VirtualService Route Management**
+- VirtualService routing rule configuration queries
+- HTTP/TCP/TLS routing rule analysis
+- Route matching conditions and destination configuration validation
+- Route health status and configuration issue detection
+
+**DestinationRule Traffic Policies**
+- DestinationRule traffic policy configuration management
+- Load balancing, connection pool, and circuit breaker configuration
+- Subset definitions and traffic distribution policies
+- Traffic policy health assessment and optimization recommendations
+
+#### Istio Health Analysis
+
+- **Intelligent Health Scoring**: Health scoring algorithm based on Istio-specific metrics
+- **Configuration Validation**: Automatic detection of common Istio configuration issues
+- **Performance Optimization Recommendations**: Optimization suggestions based on resource usage
+- **Fault Diagnosis**: Detailed error indicators and troubleshooting information
+
 ### Cluster Monitoring Features
 
 The system provides powerful cluster monitoring capabilities through the `ClusterMonitor` class for efficient cluster state monitoring:
@@ -192,9 +237,17 @@ The system provides powerful cluster monitoring capabilities through the `Cluste
 
 The system adopts a modular API design, mainly including:
 
+#### K8s Resource Management API
 - **Node API**: Node management API, supporting retrieval of node lists, details, and capacity information
 - **Pod API**: Pod management API, supporting retrieval of Pod lists and details
-- **Other Resource APIs**: Supporting management of Deployment, Service, and other resources
+- **Deployment API**: Deployment management API, supporting deployment status monitoring and scaling operations
+- **Service API**: Service management API, supporting service discovery and endpoint management
+- **Other Resource APIs**: Supporting management of ConfigMap, Secret, and other resources
+
+#### Istio Service Mesh API
+- **Istio Workload API**: Istiod and Gateway workload monitoring
+- **Istio Component API**: Gateway, VirtualService, DestinationRule management
+- **Istio Health API**: Service mesh health status and performance analysis
 
 All APIs adopt a unified response format, including status code, message, and data parts, ensuring client handling consistency.
 
@@ -230,7 +283,19 @@ All APIs adopt a unified response format, including status code, message, and da
 │       │   └── ...         # Other resource APIs
 │       └── istio/         # Istio related API modules
 │           ├── __init__.py
-│           └── gateway_api.py # Istio Gateway management API
+│           ├── router.py      # Istio unified route registration
+│           ├── workloads/     # Istio workload management
+│           │   ├── istiod_api.py # Istiod workload API
+│           │   └── gateway_workload_api.py # Gateway workload API
+│           ├── components/    # Istio component management
+│           │   ├── gateway_api.py # Gateway configuration API
+│           │   ├── virtualservice_api.py # VirtualService API
+│           │   └── destinationrule_api.py # DestinationRule API
+│           ├── utils/         # Istio utility modules
+│           │   ├── istio_parser.py # Istio resource parsing
+│           │   ├── health_analyzer.py # Health analysis
+│           │   └── cache_manager.py # Cache management
+│           └── health_summary_api.py # Health summary API
 └── unit_test/             # Test modules
     ├── test_async_performance.py # Async performance tests
     ├── test_cluster_monitor.py   # Cluster monitoring tests
@@ -253,15 +318,17 @@ All APIs adopt a unified response format, including status code, message, and da
 - [x] Caching mechanism and performance optimization
 - [x] Complete testing tools
 
-### Phase 3 (In Progress)
+### Phase 3 ✅
 - [x] Unified API response format
 - [x] Improved error handling mechanism
 - [x] Complete API documentation and examples
-- [ ] AI Dashboard backend
+- [x] Istio service mesh complete support
 - [x] Log and event collection
-- [ ] AI Chat backend integration
+- [x] System integration testing and documentation
 
 ### Phase 4 (Planned)
+- [ ] AI Dashboard backend
+- [ ] AI Chat backend integration
 - [ ] K8s Fast Dashboard
 - [ ] Istio Fast Dashboard
 - [ ] LLM intelligent analysis
